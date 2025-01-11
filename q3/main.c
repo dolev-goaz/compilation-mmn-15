@@ -49,11 +49,11 @@ void for_range() {
 
     Meta for_meta = meta();
 
-    gen("IASN %s %s\n", counter, initial_value);
+    gen("IASN %s %s\n", counter, initial_value);                    // counter = initial_value
     label(for_meta.cond_label);
-    gen("IGRT %s %s %s\n", for_meta.cond_var, counter, max_value);
-    gen("JUMPZ L%d %s\n", for_meta.loop_label, for_meta.cond_var);
-    gen("JUMP L%d\n", for_meta.finish_label);
+    gen("IGRT %s %s %s\n", for_meta.cond_var, counter, max_value);  // cond_var = (counter > max_value)
+    gen("JUMPZ L%d %s\n", for_meta.loop_label, for_meta.cond_var);  // if (!cond_var) loop
+    gen("JUMP L%d\n", for_meta.finish_label);                       // "else" end
     label(for_meta.loop_label);
 
     match(SEMICOL);
@@ -64,8 +64,8 @@ void for_range() {
     match(CLOSE_BRACKET);
 
     stmt();
-    gen("IADD %s %d\n", counter, step);
-    gen("JUMP L%d\n", for_meta.cond_label);
+    gen("IADD %s %s %d\n", counter, counter, step); // counter += step
+    gen("JUMP L%d\n", for_meta.cond_label);         // back to loop condition
     label(for_meta.finish_label);
 
 
