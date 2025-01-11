@@ -1,7 +1,7 @@
 #include "extern.h"
 #include "lex.h"
 
-extern enum Token lookahead;
+extern Token lookahead;
 extern LexicalValue lexicalValue;
 
 void stmt();
@@ -52,8 +52,8 @@ void for_range() {
     gen("IASN %s %s\n", counter, initial_value);
     label(for_meta.cond_label);
     gen("IGRT %s %s %s\n", for_meta.cond_var, counter, max_value);
-    gen("JUMPZ %s %s\n", for_meta.loop_label, for_meta.cond_label);
-    gen("JUMP %s\n", for_meta.finish_label);
+    gen("JUMPZ L%d %s\n", for_meta.loop_label, for_meta.cond_var);
+    gen("JUMP L%d\n", for_meta.finish_label);
     label(for_meta.loop_label);
 
     match(SEMICOL);
@@ -65,7 +65,7 @@ void for_range() {
 
     stmt();
     gen("IADD %s %d\n", counter, step);
-    gen("JUMP %s\n", for_meta.cond_label);
+    gen("JUMP L%d\n", for_meta.cond_label);
     label(for_meta.finish_label);
 
 
@@ -75,13 +75,18 @@ void for_range() {
     free_meta(for_meta);
 }
 
+void empty_stmt() {
+    gen("**Empty statement**\n");
+}
+
 void stmt() {
     switch (lookahead) {
         case FOR_RANGE:
             for_range();
             return;
         default:
-            error();
+            empty_stmt();
+            return;
     }
 }
 
