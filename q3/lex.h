@@ -2,7 +2,7 @@
 #include <string.h>
 #include "extern.h"
 
-typedef enum Token {
+typedef enum {
     ID = 1,
     FOR_RANGE,
     TO,
