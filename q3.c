@@ -67,10 +67,17 @@ void for_range() {
 
     Meta for_meta = meta();
 
+    /* pseudo: gen(IASN counter initial_value) */
     gen("IASN %s %s\n", counter, initial_value);                    // counter = initial_value
     label(for_meta.cond_label);
+    
+    /* pseudo: gen(IGRT for_meta.cond_var counter max_value) */
     gen("IGRT %s %s %s\n", for_meta.cond_var, counter, max_value);  // cond_var = (counter > max_value)
+
+    /* pseudo: gen(JUMPZ for_meta.loop_label for_meta.cond_var) */
     gen("JUMPZ L%d %s\n", for_meta.loop_label, for_meta.cond_var);  // if (!cond_var): loop
+
+    /* pseudo: gen(JUMP for_meta.finish_label) */
     gen("JUMP L%d\n", for_meta.finish_label);                       // else: end loop
     label(for_meta.loop_label);
 
@@ -82,7 +89,9 @@ void for_range() {
     match(CLOSE_BRACKET);
 
     stmt();
+    /* pseudo: gen(IADD counter counter step) */
     gen("IADD %s %s %d\n", counter, counter, step); // counter += step
+    /* pseudo: gen(JUMP for_meta.cond_label) */
     gen("JUMP L%d\n", for_meta.cond_label);         // back to loop condition
     label(for_meta.finish_label);
 
